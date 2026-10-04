@@ -4,6 +4,7 @@ import '../widgets/rabbit_avatar.dart';
 import '../app/rabbit_state.dart';
 import '../services/task_storage.dart';
 import '../models/task.dart';
+import 'create_task_screen.dart';
 
 class ParentScreen extends StatefulWidget {
   const ParentScreen({super.key});
@@ -44,7 +45,14 @@ class _ParentScreenState extends State<ParentScreen> {
             const SizedBox(height: 30),
 
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CreateTaskScreen(),
+                  ),
+                );
+              },
               child: const Text('СОЗДАТЬ ЗАДАНИЕ'),
             ),
 
