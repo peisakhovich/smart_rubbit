@@ -20,10 +20,10 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
   int count = 10;
 
   int operand1Min = 1;
-  int operand1Max = 10;
+  int operand1Max = 100;
 
   int operand2Min = 1;
-  int operand2Max = 10;
+  int operand2Max = 100;
 
   int multiplicationFactor = 2;
 
@@ -224,7 +224,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                   child: _buildNumberDropdown(
                     title: 'Первое число от',
                     value: operand1Min,
-                    values: List.generate(20, (index) => index + 1),
+                    values: List.generate(100, (index) => index + 1),
                     onChanged: (value) {
                       setState(() {
                         operand1Min = value!;
@@ -239,7 +239,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                   child: _buildNumberDropdown(
                     title: 'Первое число до',
                     value: operand1Max,
-                    values: List.generate(20, (index) => index + 1),
+                    values: List.generate(100, (index) => index + 1),
                     onChanged: (value) {
                       setState(() {
                         operand1Max = value!;
@@ -258,7 +258,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                   child: _buildNumberDropdown(
                     title: 'Второе число от',
                     value: operand2Min,
-                    values: List.generate(20, (index) => index + 1),
+                    values: List.generate(100, (index) => index + 1),
                     onChanged: (value) {
                       setState(() {
                         operand2Min = value!;
@@ -273,7 +273,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                   child: _buildNumberDropdown(
                     title: 'Второе число до',
                     value: operand2Max,
-                    values: List.generate(20, (index) => index + 1),
+                    values: List.generate(100, (index) => index + 1),
                     onChanged: (value) {
                       setState(() {
                         operand2Max = value!;
@@ -445,6 +445,8 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
       height: 58,
       child: ElevatedButton.icon(
         onPressed: () async {
+          print('CREATE: arithmetic = $arithmetic');
+          print('CREATE: multiplicationFactor = $multiplicationFactor');
           if (nameController.text.trim().isEmpty) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Введите название задания')),
@@ -471,7 +473,9 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
           final task = generator.generate(
             number: nextNumber,
             name: nameController.text.trim(),
+            type: arithmetic ? 'arithmetic' : 'multiplication_table',
             count: count,
+            multiplicationFactor: multiplicationFactor,
             operand1Min: operand1Min,
             operand1Max: operand1Max,
             operand2Min: operand2Min,
@@ -479,7 +483,11 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
             addition: addition,
             subtraction: subtraction,
             multiplication: multiplication,
+            division: division,
           );
+
+          print('TASK type = ${task.type}');
+          print('TASK factor = ${task.settings.multiplicationFactor}');
 
           await storage.saveTask(task);
 
