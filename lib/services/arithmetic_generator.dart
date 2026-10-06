@@ -20,8 +20,6 @@ class ArithmeticGenerator {
     required bool multiplication,
     required bool division,
   }) {
-    print('GENERATOR RECEIVED type = $type');
-    print('GENERATOR RECEIVED factor = $multiplicationFactor');
     final operations = <String>[];
 
     if (addition) {

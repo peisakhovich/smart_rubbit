@@ -445,8 +445,6 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
       height: 58,
       child: ElevatedButton.icon(
         onPressed: () async {
-          print('CREATE: arithmetic = $arithmetic');
-          print('CREATE: multiplicationFactor = $multiplicationFactor');
           if (nameController.text.trim().isEmpty) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Введите название задания')),
@@ -485,9 +483,6 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
             multiplication: multiplication,
             division: division,
           );
-
-          print('TASK type = ${task.type}');
-          print('TASK factor = ${task.settings.multiplicationFactor}');
 
           await storage.saveTask(task);
 
