@@ -35,23 +35,31 @@ class _ParentScreenState extends State<ParentScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Взрослый')),
+      appBar: AppBar(
+        title: const Text('Взрослый'),
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const RabbitAvatar(state: RabbitState.think),
+            const RabbitAvatar(
+              state: RabbitState.think,
+            ),
 
             const SizedBox(height: 30),
 
             ElevatedButton(
-              onPressed: () {
-                Navigator.push(
+              onPressed: () async {
+                await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => const CreateTaskScreen(),
                   ),
                 );
+
+                if (!mounted) return;
+
+                await loadTasks();
               },
               child: const Text('СОЗДАТЬ ЗАДАНИЕ'),
             ),
@@ -75,7 +83,9 @@ class _ParentScreenState extends State<ParentScreen> {
 
                               Navigator.pop(context);
                             },
-                            child: Text('№${task.number} — ${task.name}'),
+                            child: Text(
+                              '№${task.number} — ${task.name}',
+                            ),
                           ),
                       ],
                     );
@@ -98,7 +108,11 @@ class _ParentScreenState extends State<ParentScreen> {
                 if (!context.mounted) return;
 
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Текущее задание: №$number')),
+                  SnackBar(
+                    content: Text(
+                      'Текущее задание: №$number',
+                    ),
+                  ),
                 );
               },
               child: const Text('ТЕКУЩЕЕ ЗАДАНИЕ'),

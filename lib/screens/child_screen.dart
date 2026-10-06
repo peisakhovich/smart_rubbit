@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 
 import '../app/rabbit_state.dart';
@@ -29,6 +27,8 @@ class _ChildScreenState extends State<ChildScreen> {
 
   bool taskCompleted = false;
 
+  bool learningStageCompleted = false;
+
   @override
   void initState() {
     super.initState();
@@ -47,26 +47,26 @@ class _ChildScreenState extends State<ChildScreen> {
     final taskNumber = await storage.getCurrentTask();
     final loadedTask = await storage.loadTask(taskNumber);
 
-    // Ищем первый пример, на который ещё не был дан ответ.
     final firstUnansweredIndex = loadedTask.items.indexWhere(
       (item) => item.answer == null,
     );
+
+    if (!mounted) return;
 
     setState(() {
       task = loadedTask;
 
       if (firstUnansweredIndex == -1) {
-        // Все примеры уже имеют ответ.
-        // Показываем последний пример.
         currentItemIndex = loadedTask.items.length - 1;
       } else {
-        // Продолжаем с первого нерешённого примера.
         currentItemIndex = firstUnansweredIndex;
       }
 
       currentItem = loadedTask.items[currentItemIndex];
 
       taskCompleted = loadedTask.statistics.completed;
+
+      learningStageCompleted = false;
 
       if (taskCompleted) {
         rabbitState = RabbitState.bye;
@@ -76,8 +76,7 @@ class _ChildScreenState extends State<ChildScreen> {
                 ? '5+'
                 : '${loadedTask.statistics.score}';
 
-        resultMessage =
-            'Задание выполнено\nОценка: $scoreText';
+        resultMessage = 'Задание выполнено\nОценка: $scoreText';
       } else {
         rabbitState = RabbitState.calcing;
         resultMessage = null;
@@ -88,8 +87,6 @@ class _ChildScreenState extends State<ChildScreen> {
   Future<void> repeatTask() async {
     final currentTask = task!;
 
-    // Создаём новые элементы задания,
-    // но стираем все предыдущие ответы.
     final resetItems = currentTask.items.map((item) {
       return TaskItem(
         number: item.number,
@@ -101,14 +98,12 @@ class _ChildScreenState extends State<ChildScreen> {
       );
     }).toList();
 
-    // Полностью сбрасываем статистику.
     final resetStatistics = TaskStatistics(
       completed: false,
       correct: 0,
       score: 0,
     );
 
-    // Создаём новое состояние задания.
     final resetTask = Task(
       number: currentTask.number,
       name: currentTask.name,
@@ -118,10 +113,10 @@ class _ChildScreenState extends State<ChildScreen> {
       statistics: resetStatistics,
     );
 
-    // Сохраняем новую попытку в JSON.
     await storage.saveTask(resetTask);
 
-    // Показываем первый пример.
+    if (!mounted) return;
+
     setState(() {
       task = resetTask;
 
@@ -135,6 +130,78 @@ class _ChildScreenState extends State<ChildScreen> {
       rabbitState = RabbitState.calcing;
 
       taskCompleted = false;
+
+      learningStageCompleted = false;
+    });
+  }
+
+  Future<void> nextTask() async {
+    final currentTask = task!;
+
+    final allTasks = await storage.loadAllTasks();
+
+    final nextTasks = allTasks
+        .where((item) => item.number > currentTask.number)
+        .toList();
+
+    nextTasks.sort(
+      (a, b) => a.number.compareTo(b.number),
+    );
+
+    if (nextTasks.isEmpty) {
+      if (!mounted) return;
+
+      setState(() {
+        learningStageCompleted = true;
+        taskCompleted = false;
+        rabbitState = RabbitState.bye;
+        resultMessage = null;
+      });
+
+      return;
+    }
+
+    final nextTask = nextTasks.first;
+
+    await storage.setCurrentTask(nextTask.number);
+
+    final firstUnansweredIndex = nextTask.items.indexWhere(
+      (item) => item.answer == null,
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      task = nextTask;
+
+      if (firstUnansweredIndex == -1) {
+        currentItemIndex = nextTask.items.length - 1;
+      } else {
+        currentItemIndex = firstUnansweredIndex;
+      }
+
+      currentItem = nextTask.items[currentItemIndex];
+
+      answerController.clear();
+
+      taskCompleted = nextTask.statistics.completed;
+
+      learningStageCompleted = false;
+
+      if (taskCompleted) {
+        rabbitState = RabbitState.bye;
+
+        final scoreText =
+            nextTask.statistics.correct == nextTask.items.length
+                ? '5+'
+                : '${nextTask.statistics.score}';
+
+        resultMessage =
+            'Задание выполнено\nОценка: $scoreText';
+      } else {
+        rabbitState = RabbitState.calcing;
+        resultMessage = null;
+      }
     });
   }
 
@@ -156,7 +223,9 @@ class _ChildScreenState extends State<ChildScreen> {
     final newCorrect =
         currentTask.statistics.correct + (isCorrect ? 1 : 0);
 
-    final updatedItems = List<TaskItem>.from(currentTask.items);
+    final updatedItems = List<TaskItem>.from(
+      currentTask.items,
+    );
 
     updatedItems[currentItemIndex] = TaskItem(
       number: currentTaskItem.number,
@@ -208,40 +277,46 @@ class _ChildScreenState extends State<ChildScreen> {
             isCorrect ? 'Правильно!' : 'Неправильно';
       });
 
-      Future.delayed(const Duration(milliseconds: 800), () {
-        if (!mounted) return;
+      Future.delayed(
+        const Duration(milliseconds: 800),
+        () {
+          if (!mounted) return;
 
-        setState(() {
-          currentItemIndex++;
-          currentItem = task!.items[currentItemIndex];
+          setState(() {
+            currentItemIndex++;
+            currentItem = task!.items[currentItemIndex];
 
-          answerController.clear();
+            answerController.clear();
 
-          resultMessage = null;
-          rabbitState = RabbitState.calcing;
-        });
-      });
+            resultMessage = null;
+            rabbitState = RabbitState.calcing;
+          });
+        },
+      );
     } else {
       setState(() {
         resultMessage =
             isCorrect ? 'Правильно!' : 'Неправильно';
       });
 
-      Future.delayed(const Duration(milliseconds: 800), () {
-        if (!mounted) return;
+      Future.delayed(
+        const Duration(milliseconds: 800),
+        () {
+          if (!mounted) return;
 
-        final scoreText =
-            task!.statistics.correct == task!.items.length
-                ? '5+'
-                : '${task!.statistics.score}';
+          final scoreText =
+              task!.statistics.correct == task!.items.length
+                  ? '5+'
+                  : '${task!.statistics.score}';
 
-        setState(() {
-          rabbitState = RabbitState.bye;
-          resultMessage =
-              'Задание выполнено\nОценка: $scoreText';
-          taskCompleted = true;
-        });
-      });
+          setState(() {
+            rabbitState = RabbitState.bye;
+            resultMessage =
+                'Задание выполнено\nОценка: $scoreText';
+            taskCompleted = true;
+          });
+        },
+      );
     }
   }
 
@@ -257,7 +332,11 @@ class _ChildScreenState extends State<ChildScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Задание №${task!.number}'),
+        title: Text(
+          learningStageCompleted
+              ? 'Smart Rabbit'
+              : 'Задание №${task!.number}',
+        ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -275,7 +354,31 @@ class _ChildScreenState extends State<ChildScreen> {
 
                 const SizedBox(height: 20),
 
-                if (!taskCompleted) ...[
+                if (learningStageCompleted) ...[
+                  const SizedBox(height: 20),
+
+                  const Text(
+                    'Этап обучения пройден',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  const Text(
+                    'Все задания выполнены.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 22,
+                    ),
+                  ),
+                ],
+
+                if (!taskCompleted &&
+                    !learningStageCompleted) ...[
                   Text(
                     'Пример ${currentItemIndex + 1} '
                     'из ${task!.items.length}',
@@ -306,19 +409,23 @@ class _ChildScreenState extends State<ChildScreen> {
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
                           border: Border.all(width: 2),
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius:
+                              BorderRadius.circular(8),
                         ),
                         child: TextField(
                           controller: answerController,
                           textAlign: TextAlign.center,
-                          keyboardType: TextInputType.number,
+                          keyboardType:
+                              TextInputType.number,
                           style: const TextStyle(
                             fontSize: 28,
                           ),
-                          decoration: const InputDecoration(
+                          decoration:
+                              const InputDecoration(
                             border: InputBorder.none,
                             isDense: true,
-                            contentPadding: EdgeInsets.zero,
+                            contentPadding:
+                                EdgeInsets.zero,
                           ),
                         ),
                       ),
@@ -338,10 +445,10 @@ class _ChildScreenState extends State<ChildScreen> {
                 if (taskCompleted) ...[
                   const SizedBox(height: 20),
 
-                  Text(
+                  const Text(
                     'Задание выполнено',
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
                     ),
@@ -350,9 +457,11 @@ class _ChildScreenState extends State<ChildScreen> {
                   const SizedBox(height: 15),
 
                   Text(
-                    task!.statistics.correct == task!.items.length
+                    task!.statistics.correct ==
+                            task!.items.length
                         ? 'Оценка: 5+'
-                        : 'Оценка: ${task!.statistics.score}',
+                        : 'Оценка: '
+                            '${task!.statistics.score}',
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 24,
@@ -369,14 +478,14 @@ class _ChildScreenState extends State<ChildScreen> {
                   const SizedBox(height: 15),
 
                   ElevatedButton(
-                    onPressed: () {
-                      // Пока ничего не делаем.
-                    },
+                    onPressed: nextTask,
                     child: const Text('СЛЕДУЮЩЕЕ'),
                   ),
                 ],
 
-                if (resultMessage != null && !taskCompleted)
+                if (resultMessage != null &&
+                    !taskCompleted &&
+                    !learningStageCompleted)
                   Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 20,
