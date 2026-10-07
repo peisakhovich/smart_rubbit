@@ -73,8 +73,8 @@ class _ChildScreenState extends State<ChildScreen> {
 
         final scoreText =
             loadedTask.statistics.correct == loadedTask.items.length
-                ? '5+'
-                : '${loadedTask.statistics.score}';
+            ? '5+'
+            : '${loadedTask.statistics.score}';
 
         resultMessage = 'Задание выполнено\nОценка: $scoreText';
       } else {
@@ -144,9 +144,7 @@ class _ChildScreenState extends State<ChildScreen> {
         .where((item) => item.number > currentTask.number)
         .toList();
 
-    nextTasks.sort(
-      (a, b) => a.number.compareTo(b.number),
-    );
+    nextTasks.sort((a, b) => a.number.compareTo(b.number));
 
     if (nextTasks.isEmpty) {
       if (!mounted) return;
@@ -191,13 +189,11 @@ class _ChildScreenState extends State<ChildScreen> {
       if (taskCompleted) {
         rabbitState = RabbitState.bye;
 
-        final scoreText =
-            nextTask.statistics.correct == nextTask.items.length
-                ? '5+'
-                : '${nextTask.statistics.score}';
+        final scoreText = nextTask.statistics.correct == nextTask.items.length
+            ? '5+'
+            : '${nextTask.statistics.score}';
 
-        resultMessage =
-            'Задание выполнено\nОценка: $scoreText';
+        resultMessage = 'Задание выполнено\nОценка: $scoreText';
       } else {
         rabbitState = RabbitState.calcing;
         resultMessage = null;
@@ -220,12 +216,9 @@ class _ChildScreenState extends State<ChildScreen> {
 
     final isCorrect = userAnswer == currentTaskItem.result;
 
-    final newCorrect =
-        currentTask.statistics.correct + (isCorrect ? 1 : 0);
+    final newCorrect = currentTask.statistics.correct + (isCorrect ? 1 : 0);
 
-    final updatedItems = List<TaskItem>.from(
-      currentTask.items,
-    );
+    final updatedItems = List<TaskItem>.from(currentTask.items);
 
     updatedItems[currentItemIndex] = TaskItem(
       number: currentTaskItem.number,
@@ -236,14 +229,12 @@ class _ChildScreenState extends State<ChildScreen> {
       answer: userAnswer,
     );
 
-    final isLastItem =
-        currentItemIndex == currentTask.items.length - 1;
+    final isLastItem = currentItemIndex == currentTask.items.length - 1;
 
     int newScore = 0;
 
     if (isLastItem) {
-      newScore =
-          ((newCorrect / updatedItems.length) * 5).round();
+      newScore = ((newCorrect / updatedItems.length) * 5).round();
     }
 
     final updatedStatistics = TaskStatistics(
@@ -273,61 +264,47 @@ class _ChildScreenState extends State<ChildScreen> {
 
     if (!isLastItem) {
       setState(() {
-        resultMessage =
-            isCorrect ? 'Правильно!' : 'Неправильно';
+        resultMessage = isCorrect ? 'Правильно!' : 'Неправильно';
       });
 
-      Future.delayed(
-        const Duration(milliseconds: 800),
-        () {
-          if (!mounted) return;
+      Future.delayed(const Duration(milliseconds: 800), () {
+        if (!mounted) return;
 
-          setState(() {
-            currentItemIndex++;
-            currentItem = task!.items[currentItemIndex];
+        setState(() {
+          currentItemIndex++;
+          currentItem = task!.items[currentItemIndex];
 
-            answerController.clear();
+          answerController.clear();
 
-            resultMessage = null;
-            rabbitState = RabbitState.calcing;
-          });
-        },
-      );
+          resultMessage = null;
+          rabbitState = RabbitState.calcing;
+        });
+      });
     } else {
       setState(() {
-        resultMessage =
-            isCorrect ? 'Правильно!' : 'Неправильно';
+        resultMessage = isCorrect ? 'Правильно!' : 'Неправильно';
       });
 
-      Future.delayed(
-        const Duration(milliseconds: 800),
-        () {
-          if (!mounted) return;
+      Future.delayed(const Duration(milliseconds: 800), () {
+        if (!mounted) return;
 
-          final scoreText =
-              task!.statistics.correct == task!.items.length
-                  ? '5+'
-                  : '${task!.statistics.score}';
+        final scoreText = task!.statistics.correct == task!.items.length
+            ? '5+'
+            : '${task!.statistics.score}';
 
-          setState(() {
-            rabbitState = RabbitState.bye;
-            resultMessage =
-                'Задание выполнено\nОценка: $scoreText';
-            taskCompleted = true;
-          });
-        },
-      );
+        setState(() {
+          rabbitState = RabbitState.bye;
+          resultMessage = 'Задание выполнено\nОценка: $scoreText';
+          taskCompleted = true;
+        });
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     if (task == null || currentItem == null) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
@@ -335,22 +312,20 @@ class _ChildScreenState extends State<ChildScreen> {
         title: Text(
           learningStageCompleted
               ? 'Smart Rabbit'
-              : 'Задание №${task!.number}',
+              : 'Задание №${task!.number} ${task!.name} — ${task!.items.length} примеров',
         ),
+        centerTitle: true,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          keyboardDismissBehavior:
-              ScrollViewKeyboardDismissBehavior.onDrag,
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const SizedBox(height: 20),
 
-                RabbitAvatar(
-                  state: rabbitState,
-                ),
+                RabbitAvatar(state: rabbitState),
 
                 const SizedBox(height: 20),
 
@@ -360,10 +335,7 @@ class _ChildScreenState extends State<ChildScreen> {
                   const Text(
                     'Этап обучения пройден',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                   ),
 
                   const SizedBox(height: 20),
@@ -371,17 +343,13 @@ class _ChildScreenState extends State<ChildScreen> {
                   const Text(
                     'Все задания выполнены.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 22,
-                    ),
+                    style: TextStyle(fontSize: 22),
                   ),
                 ],
 
-                if (!taskCompleted &&
-                    !learningStageCompleted) ...[
+                if (!taskCompleted && !learningStageCompleted) ...[
                   Text(
-                    'Пример ${currentItemIndex + 1} '
-                    'из ${task!.items.length}',
+                    'Пример ${currentItemIndex + 1} ',
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -398,9 +366,7 @@ class _ChildScreenState extends State<ChildScreen> {
                         '${currentItem!.operand1} '
                         '${currentItem!.operation} '
                         '${currentItem!.operand2} = ',
-                        style: const TextStyle(
-                          fontSize: 32,
-                        ),
+                        style: const TextStyle(fontSize: 32),
                       ),
 
                       Container(
@@ -409,23 +375,17 @@ class _ChildScreenState extends State<ChildScreen> {
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
                           border: Border.all(width: 2),
-                          borderRadius:
-                              BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(8),
                         ),
                         child: TextField(
                           controller: answerController,
                           textAlign: TextAlign.center,
-                          keyboardType:
-                              TextInputType.number,
-                          style: const TextStyle(
-                            fontSize: 28,
-                          ),
-                          decoration:
-                              const InputDecoration(
+                          keyboardType: TextInputType.number,
+                          style: const TextStyle(fontSize: 28),
+                          decoration: const InputDecoration(
                             border: InputBorder.none,
                             isDense: true,
-                            contentPadding:
-                                EdgeInsets.zero,
+                            contentPadding: EdgeInsets.zero,
                           ),
                         ),
                       ),
@@ -448,24 +408,18 @@ class _ChildScreenState extends State<ChildScreen> {
                   const Text(
                     'Задание выполнено',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
                   ),
 
                   const SizedBox(height: 15),
 
                   Text(
-                    task!.statistics.correct ==
-                            task!.items.length
+                    task!.statistics.correct == task!.items.length
                         ? 'Оценка: 5+'
                         : 'Оценка: '
-                            '${task!.statistics.score}',
+                              '${task!.statistics.score}',
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 24,
-                    ),
+                    style: const TextStyle(fontSize: 24),
                   ),
 
                   const SizedBox(height: 25),
@@ -487,15 +441,11 @@ class _ChildScreenState extends State<ChildScreen> {
                     !taskCompleted &&
                     !learningStageCompleted)
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Text(
                       resultMessage!,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 24,
-                      ),
+                      style: const TextStyle(fontSize: 24),
                     ),
                   ),
 

@@ -43,7 +43,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Создать задание')),
+      appBar: AppBar(title: const Text('Создать задание'), centerTitle: true),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(12),
         child: Column(

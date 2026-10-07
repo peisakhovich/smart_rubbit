@@ -11,7 +11,10 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Умный кролик Uszko')),
+      appBar: AppBar(
+        title: const Text('Умный кролик Uszko'),
+        centerTitle: true,
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -22,20 +25,20 @@ class HomeScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const ParentScreen()),
+                  MaterialPageRoute(builder: (context) => const ChildScreen()),
                 );
               },
-              child: const Text('ВЗРОСЛЫЙ'),
+              child: const Text('УЧЕНИК'),
             ),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const ChildScreen()),
+                  MaterialPageRoute(builder: (context) => const ParentScreen()),
                 );
               },
-              child: const Text('РЕБЁНОК'),
+              child: const Text('УЧИТЕЛЬ'),
             ),
           ],
         ),

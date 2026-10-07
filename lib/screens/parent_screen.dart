@@ -35,16 +35,12 @@ class _ParentScreenState extends State<ParentScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Взрослый'),
-      ),
+      appBar: AppBar(title: const Text('Учитель'), centerTitle: true),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const RabbitAvatar(
-              state: RabbitState.think,
-            ),
+            const RabbitAvatar(state: RabbitState.think),
 
             const SizedBox(height: 30),
 
@@ -83,9 +79,7 @@ class _ParentScreenState extends State<ParentScreen> {
 
                               Navigator.pop(context);
                             },
-                            child: Text(
-                              '№${task.number} — ${task.name}',
-                            ),
+                            child: Text('№${task.number} — ${task.name}'),
                           ),
                       ],
                     );
@@ -101,18 +95,12 @@ class _ParentScreenState extends State<ParentScreen> {
               onPressed: () async {
                 final storage = TaskStorage();
 
-                await storage.setCurrentTask(1);
-
                 final number = await storage.getCurrentTask();
 
                 if (!context.mounted) return;
 
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      'Текущее задание: №$number',
-                    ),
-                  ),
+                  SnackBar(content: Text('Текущее задание: №$number')),
                 );
               },
               child: const Text('ТЕКУЩЕЕ ЗАДАНИЕ'),
