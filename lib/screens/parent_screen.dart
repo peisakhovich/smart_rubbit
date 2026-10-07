@@ -5,6 +5,7 @@ import '../app/rabbit_state.dart';
 import '../services/task_storage.dart';
 import '../models/task.dart';
 import 'create_task_screen.dart';
+import 'statistics_screen.dart';
 
 class ParentScreen extends StatefulWidget {
   const ParentScreen({super.key});
@@ -104,6 +105,19 @@ class _ParentScreenState extends State<ParentScreen> {
                 );
               },
               child: const Text('ТЕКУЩЕЕ ЗАДАНИЕ'),
+            ),
+            const SizedBox(height: 15),
+
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const StatisticsScreen(),
+                  ),
+                );
+              },
+              child: const Text('СТАТИСТИКА'),
             ),
           ],
         ),
