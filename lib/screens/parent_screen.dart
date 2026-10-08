@@ -6,6 +6,7 @@ import '../services/task_storage.dart';
 import '../models/task.dart';
 import 'create_task_screen.dart';
 import 'statistics_screen.dart';
+import 'settings_screen.dart';
 
 class ParentScreen extends StatefulWidget {
   const ParentScreen({super.key});
@@ -118,6 +119,19 @@ class _ParentScreenState extends State<ParentScreen> {
                 );
               },
               child: const Text('СТАТИСТИКА'),
+            ),
+            const SizedBox(height: 15),
+
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SettingsScreen(),
+                  ),
+                );
+              },
+              child: const Text('НАСТРОЙКИ'),
             ),
           ],
         ),
