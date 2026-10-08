@@ -87,4 +87,42 @@ class TaskStorage {
 
     return json['number'];
   }
+
+  Future<void> clearCurrentTask() async {
+    final appDirectory = await getApplicationDocumentsDirectory();
+
+    final file = File('${appDirectory.path}/current_task.json');
+
+    final json = jsonEncode({'number': 0});
+
+    await file.writeAsString(json);
+  }
+
+  Future<void> deleteTask(int number) async {
+    final tasksDirectory = await getTasksDirectory();
+
+    final fileName = '${number.toString().padLeft(4, '0')}.json';
+    final file = File('${tasksDirectory.path}/$fileName');
+
+    if (await file.exists()) {
+      await file.delete();
+    }
+  }
+
+  Future<void> deleteAllTasks() async {
+    final tasksDirectory = await getTasksDirectory();
+
+    final files = await tasksDirectory
+        .list()
+        .where((entity) => entity is File && entity.path.endsWith('.json'))
+        .toList();
+
+    for (final entity in files) {
+      final file = File(entity.path);
+
+      if (await file.exists()) {
+        await file.delete();
+      }
+    }
+  }
 }

@@ -22,6 +22,8 @@ class _ParentScreenState extends State<ParentScreen> {
   Future<void> loadTasks() async {
     final loadedTasks = await storage.loadAllTasks();
 
+    if (!mounted) return;
+
     setState(() {
       tasks = loadedTasks;
     });
@@ -32,6 +34,123 @@ class _ParentScreenState extends State<ParentScreen> {
     super.initState();
 
     loadTasks();
+  }
+
+  Future<void> deleteCurrentTask(BuildContext dialogContext) async {
+    final currentNumber = await storage.getCurrentTask();
+
+    if (!dialogContext.mounted) return;
+
+    Navigator.pop(dialogContext);
+
+    if (currentNumber == 0) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Текущее задание не выбрано')),
+      );
+      return;
+    }
+
+    await storage.deleteTask(currentNumber);
+    await storage.clearCurrentTask();
+
+    if (!context.mounted) return;
+
+    await loadTasks();
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Задание №$currentNumber удалено')));
+  }
+
+  Future<void> deleteAllTasks(BuildContext dialogContext) async {
+    Navigator.pop(dialogContext);
+
+    if (!mounted) return;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Удалить все задания?'),
+          content: const Text(
+            'Все созданные задания и их статистика будут удалены.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, false);
+              },
+              child: const Text('ОТМЕНА'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+              child: const Text('УДАЛИТЬ ВСЁ'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (!mounted || confirmed != true) return;
+
+    await storage.deleteAllTasks();
+    await storage.clearCurrentTask();
+
+    if (!mounted) return;
+
+    await loadTasks();
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text('Все задания удалены')));
+  }
+
+  void showDeleteDialog() {
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return SimpleDialog(
+          title: const Text('Удаление задания'),
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+              child: ElevatedButton(
+                onPressed: () async {
+                  await deleteCurrentTask(dialogContext);
+                },
+                child: const Text('УДАЛИТЬ ТЕКУЩЕЕ'),
+              ),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+              child: ElevatedButton(
+                onPressed: () async {
+                  await deleteAllTasks(dialogContext);
+                },
+                child: const Text('УДАЛИТЬ ВСЕ'),
+              ),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+              child: TextButton(
+                onPressed: () {
+                  Navigator.pop(dialogContext);
+                },
+                child: const Text('ОТМЕНА'),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -68,7 +187,7 @@ class _ParentScreenState extends State<ParentScreen> {
               onPressed: () {
                 showDialog(
                   context: context,
-                  builder: (context) {
+                  builder: (dialogContext) {
                     return SimpleDialog(
                       title: const Text('Выберите задание'),
                       children: [
@@ -77,9 +196,9 @@ class _ParentScreenState extends State<ParentScreen> {
                             onPressed: () async {
                               await storage.setCurrentTask(task.number);
 
-                              if (!context.mounted) return;
+                              if (!dialogContext.mounted) return;
 
-                              Navigator.pop(context);
+                              Navigator.pop(dialogContext);
                             },
                             child: Text('№${task.number} — ${task.name}'),
                           ),
@@ -95,18 +214,30 @@ class _ParentScreenState extends State<ParentScreen> {
 
             ElevatedButton(
               onPressed: () async {
-                final storage = TaskStorage();
-
                 final number = await storage.getCurrentTask();
 
                 if (!context.mounted) return;
 
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Текущее задание: №$number')),
+                  SnackBar(
+                    content: Text(
+                      number == 0
+                          ? 'Текущее задание не выбрано'
+                          : 'Текущее задание: №$number',
+                    ),
+                  ),
                 );
               },
               child: const Text('ТЕКУЩЕЕ ЗАДАНИЕ'),
             ),
+
+            const SizedBox(height: 15),
+
+            ElevatedButton(
+              onPressed: showDeleteDialog,
+              child: const Text('УДАЛИТЬ ЗАДАНИЕ'),
+            ),
+
             const SizedBox(height: 15),
 
             ElevatedButton(
@@ -120,6 +251,7 @@ class _ParentScreenState extends State<ParentScreen> {
               },
               child: const Text('СТАТИСТИКА'),
             ),
+
             const SizedBox(height: 15),
 
             ElevatedButton(

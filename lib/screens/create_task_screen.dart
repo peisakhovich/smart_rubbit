@@ -4,6 +4,7 @@ import '../app/rabbit_state.dart';
 import '../widgets/rabbit_avatar.dart';
 import '../services/arithmetic_generator.dart';
 import '../services/task_storage.dart';
+import '../services/settings_storage.dart';
 
 class CreateTaskScreen extends StatefulWidget {
   const CreateTaskScreen({super.key});
@@ -20,10 +21,10 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
   int count = 10;
 
   int operand1Min = 1;
-  int operand1Max = 100;
+  int operand1Max = 10;
 
   int operand2Min = 1;
-  int operand2Max = 100;
+  int operand2Max = 10;
 
   int multiplicationFactor = 2;
 
@@ -455,6 +456,24 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
           final storage = TaskStorage();
 
           final tasks = await storage.loadAllTasks();
+
+          final settingsStorage = SettingsStorage();
+          final settings = await settingsStorage.loadSettings();
+
+          if (tasks.length >= settings.maxTasksPerStack) {
+            if (!mounted) return;
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Достигнуто максимальное количество заданий: '
+                  '${settings.maxTasksPerStack}',
+                ),
+              ),
+            );
+
+            return;
+          }
 
           int nextNumber = 1;
 
