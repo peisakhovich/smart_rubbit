@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../app/rabbit_state.dart';
 import '../localization/localization.dart';
 import '../models/task.dart';
+import '../services/settings_storage.dart';
 import '../services/task_storage.dart';
 import '../widgets/rabbit_avatar.dart';
 
@@ -15,6 +16,7 @@ class ChildScreen extends StatefulWidget {
 
 class _ChildScreenState extends State<ChildScreen> {
   final TaskStorage storage = TaskStorage();
+  final SettingsStorage settingsStorage = SettingsStorage();
   final TextEditingController answerController = TextEditingController();
 
   Task? task;
@@ -28,6 +30,7 @@ class _ChildScreenState extends State<ChildScreen> {
 
   bool taskCompleted = false;
   bool learningStageCompleted = false;
+  bool showLowScore = false;
 
   @override
   void initState() {
@@ -44,6 +47,7 @@ class _ChildScreenState extends State<ChildScreen> {
   Future<void> loadCurrentTask() async {
     final taskNumber = await storage.getCurrentTask();
     final loadedTask = await storage.loadTask(taskNumber);
+    final settings = await settingsStorage.loadSettings();
 
     final firstUnansweredIndex = loadedTask.items.indexWhere(
       (item) => item.answer == null,
@@ -53,6 +57,7 @@ class _ChildScreenState extends State<ChildScreen> {
 
     setState(() {
       task = loadedTask;
+      showLowScore = settings.showLowScore;
 
       currentItemIndex = firstUnansweredIndex == -1
           ? loadedTask.items.length - 1
@@ -73,11 +78,27 @@ class _ChildScreenState extends State<ChildScreen> {
     });
   }
 
+  String? _scoreText(Task completedTask) {
+    final score = completedTask.statistics.score;
+
+    // Если показ низких оценок выключен, оценку ниже 4 не показываем.
+    if (!showLowScore && score < 4) {
+      return null;
+    }
+
+    if (completedTask.statistics.correct == completedTask.items.length) {
+      return '5+';
+    }
+
+    return '$score';
+  }
+
   String _completedMessage(Task completedTask) {
-    final scoreText =
-        completedTask.statistics.correct == completedTask.items.length
-        ? '5+'
-        : '${completedTask.statistics.score}';
+    final scoreText = _scoreText(completedTask);
+
+    if (scoreText == null) {
+      return lng.childTaskCompleted;
+    }
 
     return '${lng.childTaskCompleted}\n'
         '${lng.childScore} $scoreText';
@@ -157,6 +178,8 @@ class _ChildScreenState extends State<ChildScreen> {
 
     await storage.setCurrentTask(nextTask.number);
 
+    final settings = await settingsStorage.loadSettings();
+
     final firstUnansweredIndex = nextTask.items.indexWhere(
       (item) => item.answer == null,
     );
@@ -165,6 +188,7 @@ class _ChildScreenState extends State<ChildScreen> {
 
     setState(() {
       task = nextTask;
+      showLowScore = settings.showLowScore;
 
       currentItemIndex = firstUnansweredIndex == -1
           ? nextTask.items.length - 1
@@ -280,6 +304,8 @@ class _ChildScreenState extends State<ChildScreen> {
     return ListenableBuilder(
       listenable: lng,
       builder: (context, child) {
+        final scoreText = _scoreText(task!);
+
         return Scaffold(
           appBar: AppBar(
             title: Text(
@@ -381,13 +407,14 @@ class _ChildScreenState extends State<ChildScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 15),
-                      Text(
-                        '${lng.childScore} '
-                        '${task!.statistics.correct == task!.items.length ? '5+' : task!.statistics.score}',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 24),
-                      ),
+                      if (scoreText != null) ...[
+                        const SizedBox(height: 15),
+                        Text(
+                          '${lng.childScore} $scoreText',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontSize: 24),
+                        ),
+                      ],
                       const SizedBox(height: 25),
                       ElevatedButton(
                         onPressed: repeatTask,
