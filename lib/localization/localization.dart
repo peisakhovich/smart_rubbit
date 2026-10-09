@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 
 import 'english.dart';
 import 'russian.dart';
+import 'ukrainian.dart';
+import 'polish.dart';
+import 'french.dart';
+import 'german.dart';
+import 'romanian.dart';
 
 class Localization extends ChangeNotifier {
   String language = 'en';
@@ -9,6 +14,11 @@ class Localization extends ChangeNotifier {
   final Map<String, dynamic> languages = {
     'en': EnglishStrings(),
     'ru': RussianStrings(),
+    'uk': UkrainianStrings(),
+    'pl': PolishStrings(),
+    'fr': FrenchStrings(),
+    'de': GermanStrings(),
+    'ro': RomanianStrings(),
   };
 
   void setLanguage(String language) {

@@ -1,5 +1,5 @@
 class EnglishStrings {
-  String get appTitle => 'Smart Rabbit';
+  String get appTitle => 'Smart Rabbit Uszko';
 
   String get homeTitle => 'Smart Rabbit Uszko';
   String get homeStudentButton => 'STUDENT';

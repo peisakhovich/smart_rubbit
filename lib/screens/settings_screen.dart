@@ -23,6 +23,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     ('fr', 'Français'),
     ('de', 'Deutsch'),
     ('ro', 'Română'),
+    ('uk', 'Українська'),
   ];
 
   @override

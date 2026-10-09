@@ -1,7 +1,7 @@
 class RussianStrings {
-  String get appTitle => 'Умный кролик';
+  String get appTitle => 'Умный кролик Uszko';
 
-  String get homeTitle => 'Умный кролик Усико';
+  String get homeTitle => 'Умный кролик Uszko';
   String get homeStudentButton => 'УЧЕНИК';
   String get homeTeacherButton => 'УЧИТЕЛЬ';
 
