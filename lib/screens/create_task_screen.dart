@@ -5,6 +5,7 @@ import '../widgets/rabbit_avatar.dart';
 import '../services/arithmetic_generator.dart';
 import '../services/task_storage.dart';
 import '../services/settings_storage.dart';
+import '../localization/localization.dart';
 
 class CreateTaskScreen extends StatefulWidget {
   const CreateTaskScreen({super.key});
@@ -43,41 +44,37 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Создать задание'), centerTitle: true),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildRabbitHeader(),
-
-            const SizedBox(height: 16),
-
-            _buildNameSection(),
-
-            const SizedBox(height: 16),
-
-            _buildTypeSection(),
-
-            const SizedBox(height: 16),
-
-            if (arithmetic) ...[
-              _buildArithmeticSection(),
-              const SizedBox(height: 16),
-              _buildOperationsSection(),
-            ] else ...[
-              _buildMultiplicationTableSection(),
-            ],
-
-            const SizedBox(height: 24),
-
-            _buildCreateButton(),
-
-            const SizedBox(height: 20),
-          ],
-        ),
-      ),
+    return ListenableBuilder(
+      listenable: lng,
+      builder: (context, child) {
+        return Scaffold(
+          appBar: AppBar(title: Text(lng.createTaskTitle), centerTitle: true),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildRabbitHeader(),
+                const SizedBox(height: 16),
+                _buildNameSection(),
+                const SizedBox(height: 16),
+                _buildTypeSection(),
+                const SizedBox(height: 16),
+                if (arithmetic) ...[
+                  _buildArithmeticSection(),
+                  const SizedBox(height: 16),
+                  _buildOperationsSection(),
+                ] else ...[
+                  _buildMultiplicationTableSection(),
+                ],
+                const SizedBox(height: 24),
+                _buildCreateButton(),
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -95,9 +92,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
               height: 120,
               child: RabbitAvatar(state: RabbitState.think),
             ),
-
             const SizedBox(width: 12),
-
             Expanded(
               child: Container(
                 padding: const EdgeInsets.all(12),
@@ -105,11 +100,9 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Text(
-                  'Привет! Давай создадим новое задание!\n\n'
-                  'Выбери параметры, и я помогу '
-                  'сгенерировать упражнения.',
-                  style: TextStyle(fontSize: 16, height: 1.35),
+                child: Text(
+                  lng.createTaskGreeting,
+                  style: const TextStyle(fontSize: 16, height: 1.35),
                 ),
               ),
             ),
@@ -127,18 +120,16 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Название задания',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            Text(
+              lng.createTaskName,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-
             const SizedBox(height: 8),
-
             TextField(
               controller: nameController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Например: Сложение от 1 до 20',
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
+                hintText: lng.createTaskNameHint,
               ),
             ),
           ],
@@ -155,13 +146,11 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Тип задания',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Text(
+              lng.createTaskType,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-
             const SizedBox(height: 8),
-
             RadioGroup<bool>(
               groupValue: arithmetic,
               onChanged: (value) {
@@ -170,16 +159,16 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                 });
               },
               child: Column(
-                children: const [
+                children: [
                   RadioListTile<bool>(
                     value: true,
-                    title: Text('Арифметика'),
-                    subtitle: Text('Сложение, вычитание, умножение, деление'),
+                    title: Text(lng.createTaskArithmetic),
+                    subtitle: Text(lng.createTaskArithmeticDescription),
                   ),
                   RadioListTile<bool>(
                     value: false,
-                    title: Text('Таблица умножения'),
-                    subtitle: Text('Примеры на умножение одной таблицы'),
+                    title: Text(lng.createTaskMultiplicationTable),
+                    subtitle: Text(lng.createTaskMultiplicationDescription),
                   ),
                 ],
               ),
@@ -199,15 +188,13 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Параметры для арифметики',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Text(
+              lng.createTaskArithmeticParameters,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-
             const SizedBox(height: 16),
-
             _buildNumberDropdown(
-              title: 'Количество примеров',
+              title: lng.createTaskCount,
               value: count,
               values: [5, 10, 15, 20],
               onChanged: (value) {
@@ -216,14 +203,12 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                 });
               },
             ),
-
             const SizedBox(height: 12),
-
             Row(
               children: [
                 Expanded(
                   child: _buildNumberDropdown(
-                    title: 'Первое число от',
+                    title: lng.createTaskFirstNumberFrom,
                     value: operand1Min,
                     values: List.generate(100, (index) => index + 1),
                     onChanged: (value) {
@@ -233,12 +218,10 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                     },
                   ),
                 ),
-
                 const SizedBox(width: 12),
-
                 Expanded(
                   child: _buildNumberDropdown(
-                    title: 'Первое число до',
+                    title: lng.createTaskFirstNumberTo,
                     value: operand1Max,
                     values: List.generate(100, (index) => index + 1),
                     onChanged: (value) {
@@ -250,14 +233,12 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                 ),
               ],
             ),
-
             const SizedBox(height: 12),
-
             Row(
               children: [
                 Expanded(
                   child: _buildNumberDropdown(
-                    title: 'Второе число от',
+                    title: lng.createTaskSecondNumberFrom,
                     value: operand2Min,
                     values: List.generate(100, (index) => index + 1),
                     onChanged: (value) {
@@ -267,12 +248,10 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                     },
                   ),
                 ),
-
                 const SizedBox(width: 12),
-
                 Expanded(
                   child: _buildNumberDropdown(
-                    title: 'Второе число до',
+                    title: lng.createTaskSecondNumberTo,
                     value: operand2Max,
                     values: List.generate(100, (index) => index + 1),
                     onChanged: (value) {
@@ -299,15 +278,13 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Параметры для таблицы умножения',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Text(
+              lng.createTaskTableParameters,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-
             const SizedBox(height: 16),
-
             _buildNumberDropdown(
-              title: 'Таблица умножения на',
+              title: lng.createTaskTableFactor,
               value: multiplicationFactor,
               values: List.generate(10, (index) => index + 1),
               onChanged: (value) {
@@ -316,9 +293,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                 });
               },
             ),
-
             const SizedBox(height: 16),
-
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
@@ -326,7 +301,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                'Будут созданы примеры:\n'
+                '${lng.createTaskExamplesPreview}'
                 '1 × $multiplicationFactor, '
                 '2 × $multiplicationFactor, '
                 '3 × $multiplicationFactor, ... '
@@ -347,57 +322,51 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Выбрать операции',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Text(
+              lng.createTaskOperations,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-
             const SizedBox(height: 6),
-
             CheckboxListTile(
               value: addition,
-              title: const Text('Сложение (+)'),
+              title: Text(lng.createTaskAddition),
               onChanged: (value) {
                 setState(() {
                   addition = value!;
                 });
               },
             ),
-
             CheckboxListTile(
               value: subtraction,
-              title: const Text('Вычитание (−)'),
+              title: Text(lng.createTaskSubtraction),
               onChanged: (value) {
                 setState(() {
                   subtraction = value!;
                 });
               },
             ),
-
             CheckboxListTile(
               value: multiplication,
-              title: const Text('Умножение (×)'),
+              title: Text(lng.createTaskMultiplication),
               onChanged: (value) {
                 setState(() {
                   multiplication = value!;
                 });
               },
             ),
-
             CheckboxListTile(
               value: division,
-              title: const Text('Деление (÷)'),
+              title: Text(lng.createTaskDivision),
               onChanged: (value) {
                 setState(() {
                   division = value!;
                 });
               },
             ),
-
             if (division)
               CheckboxListTile(
                 value: divisionMultiples,
-                title: const Text('Только деление без остатка'),
+                title: Text(lng.createTaskDivisionWithoutRemainder),
                 onChanged: (value) {
                   setState(() {
                     divisionMultiples = value!;
@@ -423,9 +392,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
           title,
           style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
         ),
-
         const SizedBox(height: 6),
-
         DropdownButtonFormField<int>(
           initialValue: value,
           decoration: const InputDecoration(border: OutlineInputBorder()),
@@ -447,14 +414,12 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
       child: ElevatedButton.icon(
         onPressed: () async {
           if (nameController.text.trim().isEmpty) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Введите название задания')),
-            );
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text(lng.createTaskEnterName)));
             return;
           }
 
           final storage = TaskStorage();
-
           final tasks = await storage.loadAllTasks();
 
           final settingsStorage = SettingsStorage();
@@ -466,12 +431,11 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  'Достигнуто максимальное количество заданий: '
+                  '${lng.createTaskMaximumReached} '
                   '${settings.maxTasksPerStack}',
                 ),
               ),
             );
-
             return;
           }
 
@@ -508,11 +472,11 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
           if (!mounted) return;
 
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Задание №$nextNumber создано')),
+            SnackBar(content: Text('${lng.createTaskCreated} №$nextNumber')),
           );
         },
         icon: const Icon(Icons.check),
-        label: const Text('Создать задание', style: TextStyle(fontSize: 18)),
+        label: Text(lng.createTaskButton, style: const TextStyle(fontSize: 18)),
       ),
     );
   }

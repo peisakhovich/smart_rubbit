@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../app/rabbit_state.dart';
+import '../localization/localization.dart';
 import '../models/task.dart';
 import '../services/task_storage.dart';
 import '../widgets/rabbit_avatar.dart';
@@ -26,20 +27,17 @@ class _ChildScreenState extends State<ChildScreen> {
   RabbitState rabbitState = RabbitState.calcing;
 
   bool taskCompleted = false;
-
   bool learningStageCompleted = false;
 
   @override
   void initState() {
     super.initState();
-
     loadCurrentTask();
   }
 
   @override
   void dispose() {
     answerController.dispose();
-
     super.dispose();
   }
 
@@ -56,32 +54,33 @@ class _ChildScreenState extends State<ChildScreen> {
     setState(() {
       task = loadedTask;
 
-      if (firstUnansweredIndex == -1) {
-        currentItemIndex = loadedTask.items.length - 1;
-      } else {
-        currentItemIndex = firstUnansweredIndex;
-      }
+      currentItemIndex = firstUnansweredIndex == -1
+          ? loadedTask.items.length - 1
+          : firstUnansweredIndex;
 
       currentItem = loadedTask.items[currentItemIndex];
 
       taskCompleted = loadedTask.statistics.completed;
-
       learningStageCompleted = false;
 
       if (taskCompleted) {
         rabbitState = RabbitState.bye;
-
-        final scoreText =
-            loadedTask.statistics.correct == loadedTask.items.length
-            ? '5+'
-            : '${loadedTask.statistics.score}';
-
-        resultMessage = 'Задание выполнено\nОценка: $scoreText';
+        resultMessage = _completedMessage(loadedTask);
       } else {
         rabbitState = RabbitState.calcing;
         resultMessage = null;
       }
     });
+  }
+
+  String _completedMessage(Task completedTask) {
+    final scoreText =
+        completedTask.statistics.correct == completedTask.items.length
+        ? '5+'
+        : '${completedTask.statistics.score}';
+
+    return '${lng.childTaskCompleted}\n'
+        '${lng.childScore} $scoreText';
   }
 
   Future<void> repeatTask() async {
@@ -119,25 +118,20 @@ class _ChildScreenState extends State<ChildScreen> {
 
     setState(() {
       task = resetTask;
-
       currentItemIndex = 0;
       currentItem = resetTask.items[0];
 
       answerController.clear();
 
       resultMessage = null;
-
       rabbitState = RabbitState.calcing;
-
       taskCompleted = false;
-
       learningStageCompleted = false;
     });
   }
 
   Future<void> nextTask() async {
     final currentTask = task!;
-
     final allTasks = await storage.loadAllTasks();
 
     final nextTasks = allTasks
@@ -172,28 +166,20 @@ class _ChildScreenState extends State<ChildScreen> {
     setState(() {
       task = nextTask;
 
-      if (firstUnansweredIndex == -1) {
-        currentItemIndex = nextTask.items.length - 1;
-      } else {
-        currentItemIndex = firstUnansweredIndex;
-      }
+      currentItemIndex = firstUnansweredIndex == -1
+          ? nextTask.items.length - 1
+          : firstUnansweredIndex;
 
       currentItem = nextTask.items[currentItemIndex];
 
       answerController.clear();
 
       taskCompleted = nextTask.statistics.completed;
-
       learningStageCompleted = false;
 
       if (taskCompleted) {
         rabbitState = RabbitState.bye;
-
-        final scoreText = nextTask.statistics.correct == nextTask.items.length
-            ? '5+'
-            : '${nextTask.statistics.score}';
-
-        resultMessage = 'Задание выполнено\nОценка: $scoreText';
+        resultMessage = _completedMessage(nextTask);
       } else {
         rabbitState = RabbitState.calcing;
         resultMessage = null;
@@ -206,7 +192,7 @@ class _ChildScreenState extends State<ChildScreen> {
 
     if (userAnswer == null) {
       setState(() {
-        resultMessage = 'Введите число';
+        resultMessage = lng.childEnterNumber;
       });
       return;
     }
@@ -254,22 +240,18 @@ class _ChildScreenState extends State<ChildScreen> {
 
     await storage.saveTask(updatedTask);
 
-    task = updatedTask;
+    if (!mounted) return;
 
-    if (isCorrect) {
-      rabbitState = RabbitState.glad;
-    } else {
-      rabbitState = RabbitState.grumpy;
-    }
+    setState(() {
+      task = updatedTask;
+      rabbitState = isCorrect ? RabbitState.glad : RabbitState.grumpy;
+      resultMessage = isCorrect ? lng.childCorrect : lng.childIncorrect;
+    });
 
-    if (!isLastItem) {
-      setState(() {
-        resultMessage = isCorrect ? 'Правильно!' : 'Неправильно';
-      });
+    Future.delayed(const Duration(milliseconds: 800), () {
+      if (!mounted) return;
 
-      Future.delayed(const Duration(milliseconds: 800), () {
-        if (!mounted) return;
-
+      if (!isLastItem) {
         setState(() {
           currentItemIndex++;
           currentItem = task!.items[currentItemIndex];
@@ -279,26 +261,14 @@ class _ChildScreenState extends State<ChildScreen> {
           resultMessage = null;
           rabbitState = RabbitState.calcing;
         });
-      });
-    } else {
-      setState(() {
-        resultMessage = isCorrect ? 'Правильно!' : 'Неправильно';
-      });
-
-      Future.delayed(const Duration(milliseconds: 800), () {
-        if (!mounted) return;
-
-        final scoreText = task!.statistics.correct == task!.items.length
-            ? '5+'
-            : '${task!.statistics.score}';
-
+      } else {
         setState(() {
           rabbitState = RabbitState.bye;
-          resultMessage = 'Задание выполнено\nОценка: $scoreText';
+          resultMessage = _completedMessage(task!);
           taskCompleted = true;
         });
-      });
-    }
+      }
+    });
   }
 
   @override
@@ -307,154 +277,149 @@ class _ChildScreenState extends State<ChildScreen> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          learningStageCompleted
-              ? 'Smart Rabbit'
-              : 'Задание №${task!.number} ${task!.name} — ${task!.items.length} примеров',
-        ),
-        centerTitle: true,
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(height: 20),
+    return ListenableBuilder(
+      listenable: lng,
+      builder: (context, child) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(
+              learningStageCompleted
+                  ? lng.appTitle
+                  : '${lng.childTaskTitle} №${task!.number} '
+                        '${task!.name} — ${task!.items.length} '
+                        '${lng.childExamples}',
+            ),
+            centerTitle: true,
+          ),
+          body: SafeArea(
+            child: SingleChildScrollView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 20),
 
-                RabbitAvatar(state: rabbitState),
+                    RabbitAvatar(state: rabbitState),
 
-                const SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
-                if (learningStageCompleted) ...[
-                  const SizedBox(height: 20),
-
-                  const Text(
-                    'Этап обучения пройден',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  const Text(
-                    'Все задания выполнены.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 22),
-                  ),
-                ],
-
-                if (!taskCompleted && !learningStageCompleted) ...[
-                  Text(
-                    'Пример ${currentItemIndex + 1} ',
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
+                    if (learningStageCompleted) ...[
+                      const SizedBox(height: 20),
                       Text(
-                        '${currentItem!.operand1} '
-                        '${currentItem!.operation} '
-                        '${currentItem!.operand2} = ',
-                        style: const TextStyle(fontSize: 32),
+                        lng.childStageCompleted,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-
-                      Container(
-                        width: 90,
-                        height: 50,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border.all(width: 2),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: TextField(
-                          controller: answerController,
-                          textAlign: TextAlign.center,
-                          keyboardType: TextInputType.number,
-                          style: const TextStyle(fontSize: 28),
-                          decoration: const InputDecoration(
-                            border: InputBorder.none,
-                            isDense: true,
-                            contentPadding: EdgeInsets.zero,
-                          ),
-                        ),
+                      const SizedBox(height: 20),
+                      Text(
+                        lng.childAllTasksCompleted,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 22),
                       ),
                     ],
-                  ),
 
-                  const SizedBox(height: 25),
+                    if (!taskCompleted && !learningStageCompleted) ...[
+                      Text(
+                        '${lng.childExample} ${currentItemIndex + 1}',
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            '${currentItem!.operand1} '
+                            '${currentItem!.operation} '
+                            '${currentItem!.operand2} = ',
+                            style: const TextStyle(fontSize: 32),
+                          ),
+                          Container(
+                            width: 90,
+                            height: 50,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border.all(width: 2),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: TextField(
+                              controller: answerController,
+                              textAlign: TextAlign.center,
+                              keyboardType: TextInputType.number,
+                              style: const TextStyle(fontSize: 28),
+                              decoration: const InputDecoration(
+                                border: InputBorder.none,
+                                isDense: true,
+                                contentPadding: EdgeInsets.zero,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 25),
+                      ElevatedButton(
+                        onPressed: checkAnswer,
+                        child: Text(lng.childCheckButton),
+                      ),
+                      const SizedBox(height: 20),
+                    ],
 
-                  ElevatedButton(
-                    onPressed: checkAnswer,
-                    child: const Text('ПРОВЕРИТЬ'),
-                  ),
+                    if (taskCompleted) ...[
+                      const SizedBox(height: 20),
+                      Text(
+                        lng.childTaskCompleted,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 15),
+                      Text(
+                        '${lng.childScore} '
+                        '${task!.statistics.correct == task!.items.length ? '5+' : task!.statistics.score}',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 24),
+                      ),
+                      const SizedBox(height: 25),
+                      ElevatedButton(
+                        onPressed: repeatTask,
+                        child: Text(lng.childRepeat),
+                      ),
+                      const SizedBox(height: 15),
+                      ElevatedButton(
+                        onPressed: nextTask,
+                        child: Text(lng.childNext),
+                      ),
+                    ],
 
-                  const SizedBox(height: 20),
-                ],
+                    if (resultMessage != null &&
+                        !taskCompleted &&
+                        !learningStageCompleted)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Text(
+                          resultMessage!,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontSize: 24),
+                        ),
+                      ),
 
-                if (taskCompleted) ...[
-                  const SizedBox(height: 20),
-
-                  const Text(
-                    'Задание выполнено',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-                  ),
-
-                  const SizedBox(height: 15),
-
-                  Text(
-                    task!.statistics.correct == task!.items.length
-                        ? 'Оценка: 5+'
-                        : 'Оценка: '
-                              '${task!.statistics.score}',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 24),
-                  ),
-
-                  const SizedBox(height: 25),
-
-                  ElevatedButton(
-                    onPressed: repeatTask,
-                    child: const Text('ПОВТОРИТЬ'),
-                  ),
-
-                  const SizedBox(height: 15),
-
-                  ElevatedButton(
-                    onPressed: nextTask,
-                    child: const Text('СЛЕДУЮЩЕЕ'),
-                  ),
-                ],
-
-                if (resultMessage != null &&
-                    !taskCompleted &&
-                    !learningStageCompleted)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Text(
-                      resultMessage!,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 24),
-                    ),
-                  ),
-
-                const SizedBox(height: 20),
-              ],
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../localization/localization.dart';
 import '../models/task.dart';
 
 class TaskStatisticsScreen extends StatelessWidget {
@@ -9,44 +10,55 @@ class TaskStatisticsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Задание №${task.number}'), centerTitle: true),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          Text(
-            task.name,
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+    return ListenableBuilder(
+      listenable: lng,
+      builder: (context, child) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text('${lng.taskStatsTitle}${task.number}'),
+            centerTitle: true,
           ),
-
-          const SizedBox(height: 15),
-
-          Text(
-            'Правильных: '
-            '${task.statistics.correct} из ${task.items.length}',
-            style: const TextStyle(fontSize: 20),
+          body: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              Text(
+                task.name,
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 15),
+              Text(
+                '${lng.taskStatsCorrect} '
+                '${task.statistics.correct} '
+                '${_ofWord()} ${task.items.length}',
+                style: const TextStyle(fontSize: 20),
+              ),
+              const SizedBox(height: 5),
+              Text(
+                '${lng.taskStatsScore} ${task.statistics.score}',
+                style: const TextStyle(fontSize: 20),
+              ),
+              const SizedBox(height: 25),
+              Text(
+                lng.taskStatsExercises,
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 10),
+              for (int i = 0; i < task.items.length; i++) _buildItem(i),
+            ],
           ),
-
-          const SizedBox(height: 5),
-
-          Text(
-            'Оценка: ${task.statistics.score}',
-            style: const TextStyle(fontSize: 20),
-          ),
-
-          const SizedBox(height: 25),
-
-          const Text(
-            'Упражнения',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-          ),
-
-          const SizedBox(height: 10),
-
-          for (int i = 0; i < task.items.length; i++) _buildItem(i),
-        ],
-      ),
+        );
+      },
     );
+  }
+
+  String _ofWord() {
+    return lng.language == 'ru' ? 'из' : 'of';
   }
 
   Widget _buildItem(int index) {
@@ -73,13 +85,17 @@ class TaskStatisticsScreen extends StatelessWidget {
           ),
         ),
         title: Text(
-          '${item.operand1} ${item.operation} ${item.operand2} = ${item.answer ?? "—"}',
+          '${item.operand1} ${item.operation} '
+          '${item.operand2} = ${item.answer ?? "—"}',
           style: const TextStyle(fontSize: 20),
         ),
         subtitle: isCorrect
-            ? const Text('Правильно', style: TextStyle(color: Colors.green))
+            ? Text(
+                lng.taskStatsCorrectStatus,
+                style: const TextStyle(color: Colors.green),
+              )
             : Text(
-                'Правильный ответ: ${item.result}',
+                '${lng.taskStatsCorrectAnswer} ${item.result}',
                 style: const TextStyle(color: Colors.red),
               ),
       ),
