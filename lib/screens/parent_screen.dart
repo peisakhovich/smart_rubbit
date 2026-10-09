@@ -4,6 +4,7 @@ import '../widgets/rabbit_avatar.dart';
 import '../app/rabbit_state.dart';
 import '../services/task_storage.dart';
 import '../models/task.dart';
+import '../localization/localization.dart';
 import 'create_task_screen.dart';
 import 'statistics_screen.dart';
 import 'settings_screen.dart';
@@ -32,7 +33,6 @@ class _ParentScreenState extends State<ParentScreen> {
   @override
   void initState() {
     super.initState();
-
     loadTasks();
   }
 
@@ -45,9 +45,9 @@ class _ParentScreenState extends State<ParentScreen> {
 
     if (currentNumber == 0) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Текущее задание не выбрано')),
-      );
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(lng.parentNoCurrentTask)));
       return;
     }
 
@@ -60,9 +60,9 @@ class _ParentScreenState extends State<ParentScreen> {
 
     if (!mounted) return;
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('Задание №$currentNumber удалено')));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('${lng.parentTaskDeleted} №$currentNumber')),
+    );
   }
 
   Future<void> deleteAllTasks(BuildContext dialogContext) async {
@@ -74,22 +74,20 @@ class _ParentScreenState extends State<ParentScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Удалить все задания?'),
-          content: const Text(
-            'Все созданные задания и их статистика будут удалены.',
-          ),
+          title: Text(lng.parentDeleteAllQuestion),
+          content: Text(lng.parentDeleteAllMessage),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(context, false);
               },
-              child: const Text('ОТМЕНА'),
+              child: Text(lng.parentCancel),
             ),
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context, true);
               },
-              child: const Text('УДАЛИТЬ ВСЁ'),
+              child: Text(lng.parentDeleteAllConfirm),
             ),
           ],
         );
@@ -108,7 +106,7 @@ class _ParentScreenState extends State<ParentScreen> {
     if (!mounted) return;
 
     ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text('Все задания удалены')));
+        .showSnackBar(SnackBar(content: Text(lng.parentAllTasksDeleted)));
   }
 
   void showDeleteDialog() {
@@ -116,7 +114,7 @@ class _ParentScreenState extends State<ParentScreen> {
       context: context,
       builder: (dialogContext) {
         return SimpleDialog(
-          title: const Text('Удаление задания'),
+          title: Text(lng.parentDeleteDialogTitle),
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
@@ -124,27 +122,25 @@ class _ParentScreenState extends State<ParentScreen> {
                 onPressed: () async {
                   await deleteCurrentTask(dialogContext);
                 },
-                child: const Text('УДАЛИТЬ ТЕКУЩЕЕ'),
+                child: Text(lng.parentDeleteCurrent),
               ),
             ),
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
               child: ElevatedButton(
                 onPressed: () async {
                   await deleteAllTasks(dialogContext);
                 },
-                child: const Text('УДАЛИТЬ ВСЕ'),
+                child: Text(lng.parentDeleteAll),
               ),
             ),
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
               child: TextButton(
                 onPressed: () {
                   Navigator.pop(dialogContext);
                 },
-                child: const Text('ОТМЕНА'),
+                child: Text(lng.parentCancel),
               ),
             ),
           ],
@@ -155,119 +151,124 @@ class _ParentScreenState extends State<ParentScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Учитель'), centerTitle: true),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const RabbitAvatar(state: RabbitState.think),
+    return ListenableBuilder(
+      listenable: lng,
+      builder: (context, child) {
+        return Scaffold(
+          appBar: AppBar(title: Text(lng.parentTitle), centerTitle: true),
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const RabbitAvatar(state: RabbitState.think),
 
-            const SizedBox(height: 30),
+                const SizedBox(height: 30),
 
-            ElevatedButton(
-              onPressed: () async {
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const CreateTaskScreen(),
-                  ),
-                );
+                ElevatedButton(
+                  onPressed: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CreateTaskScreen(),
+                      ),
+                    );
 
-                if (!mounted) return;
+                    if (!mounted) return;
 
-                await loadTasks();
-              },
-              child: const Text('СОЗДАТЬ ЗАДАНИЕ'),
-            ),
+                    await loadTasks();
+                  },
+                  child: Text(lng.parentCreateTask),
+                ),
 
-            const SizedBox(height: 15),
+                const SizedBox(height: 15),
 
-            ElevatedButton(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (dialogContext) {
-                    return SimpleDialog(
-                      title: const Text('Выберите задание'),
-                      children: [
-                        for (final task in tasks)
-                          SimpleDialogOption(
-                            onPressed: () async {
-                              await storage.setCurrentTask(task.number);
+                ElevatedButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (dialogContext) {
+                        return SimpleDialog(
+                          title: Text(lng.parentChooseTask),
+                          children: [
+                            for (final task in tasks)
+                              SimpleDialogOption(
+                                onPressed: () async {
+                                  await storage.setCurrentTask(task.number);
 
-                              if (!dialogContext.mounted) return;
+                                  if (!dialogContext.mounted) return;
 
-                              Navigator.pop(dialogContext);
-                            },
-                            child: Text('№${task.number} — ${task.name}'),
-                          ),
-                      ],
+                                  Navigator.pop(dialogContext);
+                                },
+                                child: Text('№${task.number} — ${task.name}'),
+                              ),
+                          ],
+                        );
+                      },
                     );
                   },
-                );
-              },
-              child: const Text('ВЫБРАТЬ ЗАДАНИЕ'),
+                  child: Text(lng.parentSelectTask),
+                ),
+
+                const SizedBox(height: 15),
+
+                ElevatedButton(
+                  onPressed: () async {
+                    final number = await storage.getCurrentTask();
+
+                    if (!context.mounted) return;
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          number == 0
+                              ? lng.parentNoCurrentTask
+                              : '${lng.parentCurrentTaskPrefix} №$number',
+                        ),
+                      ),
+                    );
+                  },
+                  child: Text(lng.parentCurrentTask),
+                ),
+
+                const SizedBox(height: 15),
+
+                ElevatedButton(
+                  onPressed: showDeleteDialog,
+                  child: Text(lng.parentDeleteTask),
+                ),
+
+                const SizedBox(height: 15),
+
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const StatisticsScreen(),
+                      ),
+                    );
+                  },
+                  child: Text(lng.parentStatistics),
+                ),
+
+                const SizedBox(height: 15),
+
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SettingsScreen(),
+                      ),
+                    );
+                  },
+                  child: Text(lng.parentSettings),
+                ),
+              ],
             ),
-
-            const SizedBox(height: 15),
-
-            ElevatedButton(
-              onPressed: () async {
-                final number = await storage.getCurrentTask();
-
-                if (!context.mounted) return;
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      number == 0
-                          ? 'Текущее задание не выбрано'
-                          : 'Текущее задание: №$number',
-                    ),
-                  ),
-                );
-              },
-              child: const Text('ТЕКУЩЕЕ ЗАДАНИЕ'),
-            ),
-
-            const SizedBox(height: 15),
-
-            ElevatedButton(
-              onPressed: showDeleteDialog,
-              child: const Text('УДАЛИТЬ ЗАДАНИЕ'),
-            ),
-
-            const SizedBox(height: 15),
-
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const StatisticsScreen(),
-                  ),
-                );
-              },
-              child: const Text('СТАТИСТИКА'),
-            ),
-
-            const SizedBox(height: 15),
-
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const SettingsScreen(),
-                  ),
-                );
-              },
-              child: const Text('НАСТРОЙКИ'),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
