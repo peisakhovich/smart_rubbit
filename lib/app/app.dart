@@ -39,7 +39,11 @@ class _SmartRabbitAppState extends State<SmartRabbitApp> {
     return ListenableBuilder(
       listenable: lng,
       builder: (context, child) {
-        return MaterialApp(title: lng.appTitle, home: const HomeScreen());
+        return MaterialApp(
+          title: lng.appTitle,
+          home: const HomeScreen(),
+          debugShowCheckedModeBanner: false,
+        );
       },
     );
   }
