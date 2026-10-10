@@ -1,9 +1,16 @@
 Smart Rabbit Uszko 🐰
 
-![Smart Rabbit Uszko — Home screen](Screenshot_20261010_210815.jpg)
-![Smart Rabbit Uszko — About screen](Screenshot_20261010_212256.jpg)
-
 Smart Rabbit Uszko is a Flutter application designed to help children practice arithmetic and multiplication tables in a friendly and engaging way.
+
+Screenshots
+
+Home screen
+
+"Smart Rabbit Uszko — Home screen" (Screenshot_20261010_210815.jpg)
+
+About screen
+
+"Smart Rabbit Uszko — About screen" (Screenshot_20261010_212256.jpg)
 
 The app features an animated rabbit companion and a simple system for parents to create and assign learning tasks to children.
 
