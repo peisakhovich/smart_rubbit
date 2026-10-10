@@ -6,13 +6,10 @@ The app features an animated rabbit companion and a simple system for parents to
 
 ## Screenshots
 
-### Home screen
+## Screenshots
 
-![Smart Rabbit Uszko — Home screen](Screenshot_20261010_210815.jpg)
-
-### About screen
-
-![Smart Rabbit Uszko — About screen](Screenshot_20261010_212256.jpg)
+- [Home screen](Screenshot_20261010_210815.jpg)
+- [About screen](Screenshot_20261010_212256.jpg)
 
 ## Features
 
