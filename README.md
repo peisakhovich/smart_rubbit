@@ -10,6 +10,7 @@ The app features an animated rabbit companion and a simple system for parents to
 
 - [Home screen](Screenshot_20261010_210815.jpg)
 - [About screen](Screenshot_20261010_212256.jpg)
+- [Teacher screen](Screenshot_20261010_210815.jpg)
 
 ## Features
 
