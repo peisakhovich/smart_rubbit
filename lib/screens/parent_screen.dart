@@ -8,6 +8,7 @@ import '../localization/localization.dart';
 import 'create_task_screen.dart';
 import 'statistics_screen.dart';
 import 'settings_screen.dart';
+import 'about_screen.dart';
 
 class ParentScreen extends StatefulWidget {
   const ParentScreen({super.key});
@@ -263,6 +264,19 @@ class _ParentScreenState extends State<ParentScreen> {
                     );
                   },
                   child: Text(lng.parentSettings),
+                ),
+                const SizedBox(height: 15),
+
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AboutScreen(),
+                      ),
+                    );
+                  },
+                  child: const Text('About'),
                 ),
               ],
             ),

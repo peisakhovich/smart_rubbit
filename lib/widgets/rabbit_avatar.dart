@@ -63,7 +63,7 @@ class _RabbitAvatarState extends State<RabbitAvatar>
         return 'assets/images/uszko/Uszko_fitness.gif';
 
       case RabbitState.glad:
-        return 'assets/images/uszko/Uszko_glad.gif';
+        return 'assets/images/uszko/Uszko_supper.gif';
 
       case RabbitState.grumpy:
         return 'assets/images/uszko/Uszko_grumpy.gif';
@@ -79,6 +79,12 @@ class _RabbitAvatarState extends State<RabbitAvatar>
 
       case RabbitState.yawns:
         return 'assets/images/uszko/Uszko_yawns.gif';
+
+      case RabbitState.testing:
+        return 'assets/images/uszko/Uszko_tester.gif';
+
+      case RabbitState.programming:
+        return 'assets/images/uszko/Uszko_programmer.gif';
     }
   }
 

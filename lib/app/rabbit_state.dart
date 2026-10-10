@@ -8,4 +8,6 @@ enum RabbitState {
   supper,
   think,
   yawns,
+  testing,
+  programming,
 }

@@ -272,7 +272,7 @@ class _ChildScreenState extends State<ChildScreen> {
       resultMessage = isCorrect ? lng.childCorrect : lng.childIncorrect;
     });
 
-    Future.delayed(const Duration(milliseconds: 800), () {
+    Future.delayed(const Duration(milliseconds: 1800), () {
       if (!mounted) return;
 
       if (!isLastItem) {
