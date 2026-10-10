@@ -1,17 +1,29 @@
-# smart_rabbit
+Smart Rabbit Uszko 🐰
 
-A new Flutter project.
+Smart Rabbit Uszko is a Flutter application designed to help children practice arithmetic and multiplication tables in a friendly and engaging way.
 
-## Getting Started
+The app features an animated rabbit companion and a simple system for parents to create and assign learning tasks to children.
 
-This project is a starting point for a Flutter application.
+Features
 
-A few resources to get you started if this is your first Flutter project:
+- Parent-assigned tasks — parents create and assign exercises for children.
+- Arithmetic exercises — practice addition, subtraction, multiplication, and division.
+- Multiplication tables — practice multiplication tables for selected factors.
+- Animated rabbit companion — Uszko reacts during learning with different animations and moods.
+- Progress tracking — answers, results, and task statistics are saved.
+- Local data storage — tasks and progress are stored on the device, without cloud accounts.
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+Technology
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- Flutter
+- Dart
+- Local JSON file storage
+- Animated GIF assets
+
+Project Status
+
+Smart Rabbit Uszko is under active development.
+
+Author
+
+Created as a personal project to make children's learning more engaging and enjoyable.
