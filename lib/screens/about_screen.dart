@@ -130,9 +130,45 @@ class AboutScreen extends StatelessWidget {
 
             const SizedBox(height: 12),
 
-            const _QrPlaceholder(
-              title: 'Download the App',
-              description: 'Scan to open the latest release on GitHub',
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: lightGreen,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.asset(
+                      'assets/images/branding/smart_rabbit_qr.png',
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Download the App',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        SizedBox(height: 6),
+                        Text(
+                          'Scan to open the latest release on GitHub',
+                          style: TextStyle(fontSize: 13, color: Colors.black54),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
 
             const SizedBox(height: 24),
