@@ -103,4 +103,9 @@ class RussianStrings {
   String get childEnterNumber => 'Введите число';
   String get childCorrect => 'Правильно!';
   String get childIncorrect => 'Неправильно';
+  String get childNoTasks => 'Заданий ещё не создано.';
+  String get childTaskNotSelected =>
+      'Задания существуют, но ни одно не назначено.';
+
+  String get aboutButton => 'О приложении';
 }

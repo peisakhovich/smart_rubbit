@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../app/rabbit_state.dart';
 import '../widgets/rabbit_avatar.dart';
@@ -8,6 +9,12 @@ class AboutScreen extends StatelessWidget {
 
   static const Color cloverGreen = Color(0xFF55A94F);
   static const Color lightGreen = Color(0xFFF0F8ED);
+
+  Future<void> _openTelegram() async {
+    final uri = Uri.parse('https://t.me/UszkoSmartRabbit');
+
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -112,16 +119,72 @@ class AboutScreen extends StatelessWidget {
 
             const SizedBox(height: 12),
 
-            const _QrPlaceholder(
-              title: 'Email',
-              description: 'Scan to contact the developer',
-            ),
-
             const SizedBox(height: 12),
 
-            const _QrPlaceholder(
-              title: 'Telegram Feedback',
-              description: 'Scan to send feedback and suggestions',
+            // Telegram channel link
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: lightGreen,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 76,
+                    height: 76,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.send_rounded,
+                      size: 42,
+                      color: cloverGreen,
+                    ),
+                  ),
+
+                  const SizedBox(width: 14),
+
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Telegram Channel',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+
+                        TextButton(
+                          onPressed: _openTelegram,
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            alignment: Alignment.centerLeft,
+                            foregroundColor: cloverGreen,
+                          ),
+                          child: const Text(
+                            'UszkoSmartRabbit',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+
+                        const Text(
+                          'Visit the developer\'s page to get help, '
+                          'contact the developer, share feedback, '
+                          'and suggest improvements.',
+                          style: TextStyle(fontSize: 13, color: Colors.black54),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
 
             const SizedBox(height: 28),
@@ -147,7 +210,9 @@ class AboutScreen extends StatelessWidget {
                       fit: BoxFit.contain,
                     ),
                   ),
+
                   const SizedBox(width: 14),
+
                   const Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -159,7 +224,9 @@ class AboutScreen extends StatelessWidget {
                             fontSize: 16,
                           ),
                         ),
+
                         SizedBox(height: 6),
+
                         Text(
                           'Scan to open the latest release on GitHub',
                           style: TextStyle(fontSize: 13, color: Colors.black54),

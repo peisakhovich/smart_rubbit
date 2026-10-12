@@ -104,4 +104,9 @@ class RomanianStrings {
   String get childEnterNumber => 'Introdu un număr';
   String get childCorrect => 'Corect!';
   String get childIncorrect => 'Incorect';
+  String get childNoTasks => 'Nu a fost creată încă nicio sarcină.';
+  String get childTaskNotSelected =>
+      'Există sarcini, dar niciuna nu a fost atribuită.';
+
+  String get aboutButton => 'Despre aplicație';
 }

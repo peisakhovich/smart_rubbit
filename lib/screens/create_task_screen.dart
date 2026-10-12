@@ -412,6 +412,9 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
     return SizedBox(
       height: 58,
       child: ElevatedButton.icon(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Color.fromARGB(255, 162, 245, 245),
+        ),
         onPressed: () async {
           if (nameController.text.trim().isEmpty) {
             ScaffoldMessenger.of(context)

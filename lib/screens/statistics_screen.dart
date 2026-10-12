@@ -55,60 +55,63 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                     style: const TextStyle(fontSize: 22),
                   ),
                 )
-              : ListView(
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    Text(
-                      '${lng.statisticsTotalTasks} ${tasks.length}',
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '${lng.statisticsCompleted} $completedTasks',
-                      style: const TextStyle(fontSize: 20),
-                    ),
-                    const SizedBox(height: 20),
-                    for (final task in tasks)
-                      Card(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        child: ListTile(
-                          title: Text(
-                            '№${task.number} — ${task.name}',
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          subtitle: task.statistics.completed
-                              ? Text(
-                                  '${lng.statisticsCorrect} '
-                                  '${task.statistics.correct} '
-                                  '${_ofWord()} '
-                                  '${task.items.length}\n'
-                                  '${lng.statisticsScore} '
-                                  '${task.statistics.score}',
-                                  style: const TextStyle(fontSize: 17),
-                                )
-                              : Text(
-                                  lng.statisticsNotCompleted,
-                                  style: const TextStyle(fontSize: 17),
-                                ),
-                          trailing: const Icon(Icons.arrow_forward_ios),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    TaskStatisticsScreen(task: task),
-                              ),
-                            );
-                          },
+              : ColoredBox(
+                  color: const Color.fromARGB(255, 220, 243, 177),
+                  child: ListView(
+                    padding: const EdgeInsets.all(16),
+                    children: [
+                      Text(
+                        '${lng.statisticsTotalTasks} ${tasks.length}',
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                  ],
+                      const SizedBox(height: 8),
+                      Text(
+                        '${lng.statisticsCompleted} $completedTasks',
+                        style: const TextStyle(fontSize: 20),
+                      ),
+                      const SizedBox(height: 20),
+                      for (final task in tasks)
+                        Card(
+                          margin: const EdgeInsets.only(bottom: 12),
+                          child: ListTile(
+                            title: Text(
+                              '№${task.number} — ${task.name}',
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            subtitle: task.statistics.completed
+                                ? Text(
+                                    '${lng.statisticsCorrect} '
+                                    '${task.statistics.correct} '
+                                    '${_ofWord()} '
+                                    '${task.items.length}\n'
+                                    '${lng.statisticsScore} '
+                                    '${task.statistics.score}',
+                                    style: const TextStyle(fontSize: 17),
+                                  )
+                                : Text(
+                                    lng.statisticsNotCompleted,
+                                    style: const TextStyle(fontSize: 17),
+                                  ),
+                            trailing: const Icon(Icons.arrow_forward_ios),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      TaskStatisticsScreen(task: task),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
         );
       },

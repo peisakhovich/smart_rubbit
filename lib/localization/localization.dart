@@ -156,6 +156,10 @@ class Localization extends ChangeNotifier {
   String get childEnterNumber => languages[language]!.childEnterNumber;
   String get childCorrect => languages[language]!.childCorrect;
   String get childIncorrect => languages[language]!.childIncorrect;
+  String get childNoTasks => languages[language]!.childNoTasks;
+  String get childTaskNotSelected => languages[language]!.childTaskNotSelected;
+
+  String get aboutButton => languages[language]!.aboutButton;
 }
 
 final lng = Localization();

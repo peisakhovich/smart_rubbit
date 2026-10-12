@@ -17,6 +17,7 @@ dependencies:
   gif: ^2.3.0
   path_provider: ^2.1.6
   flutter_launcher_icons: ^0.14.4
+  url_launcher: ^6.3.3
 
 flutter_launcher_icons:
   android: true
@@ -37,3 +38,4 @@ flutter:
     - assets/images/uszko/
     - assets/images/branding/clover_lab_logo.png
     - assets/images/branding/smart_rabbit_qr.png
+    - assets/images/branding/SmartRabbitTelegram.png

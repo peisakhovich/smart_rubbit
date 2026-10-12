@@ -25,9 +25,11 @@ class _ChildScreenState extends State<ChildScreen> {
   int currentItemIndex = 0;
 
   String? resultMessage;
+  String? taskUnavailableMessage;
 
   RabbitState rabbitState = RabbitState.calcing;
 
+  bool isLoading = true;
   bool taskCompleted = false;
   bool learningStageCompleted = false;
   bool showLowScore = false;
@@ -45,37 +47,117 @@ class _ChildScreenState extends State<ChildScreen> {
   }
 
   Future<void> loadCurrentTask() async {
-    final taskNumber = await storage.getCurrentTask();
-    final loadedTask = await storage.loadTask(taskNumber);
-    final settings = await settingsStorage.loadSettings();
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+        taskUnavailableMessage = null;
+      });
+    }
 
-    final firstUnansweredIndex = loadedTask.items.indexWhere(
-      (item) => item.answer == null,
-    );
+    try {
+      // Сначала проверяем, существуют ли задания вообще.
+      final allTasks = await storage.loadAllTasks();
+      final settings = await settingsStorage.loadSettings();
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    setState(() {
-      task = loadedTask;
-      showLowScore = settings.showLowScore;
-
-      currentItemIndex = firstUnansweredIndex == -1
-          ? loadedTask.items.length - 1
-          : firstUnansweredIndex;
-
-      currentItem = loadedTask.items[currentItemIndex];
-
-      taskCompleted = loadedTask.statistics.completed;
-      learningStageCompleted = false;
-
-      if (taskCompleted) {
-        rabbitState = RabbitState.bye;
-        resultMessage = _completedMessage(loadedTask);
-      } else {
-        rabbitState = RabbitState.calcing;
-        resultMessage = null;
+      if (allTasks.isEmpty) {
+        setState(() {
+          isLoading = false;
+          showLowScore = settings.showLowScore;
+          taskUnavailableMessage = lng.childNoTasks;
+        });
+        return;
       }
-    });
+
+      // При первом запуске файл current_task.json может отсутствовать.
+      int taskNumber;
+
+      try {
+        taskNumber = await storage.getCurrentTask();
+      } catch (_) {
+        taskNumber = 0;
+      }
+
+      // Номер 0 означает, что задание не назначено.
+      if (taskNumber <= 0) {
+        setState(() {
+          isLoading = false;
+          showLowScore = settings.showLowScore;
+          taskUnavailableMessage = lng.childTaskNotSelected;
+        });
+        return;
+      }
+
+      // Ищем назначенное задание среди существующих.
+      Task? loadedTask;
+
+      for (final candidate in allTasks) {
+        if (candidate.number == taskNumber) {
+          loadedTask = candidate;
+          break;
+        }
+      }
+
+      // Назначенное задание могло быть удалено.
+      if (loadedTask == null) {
+        setState(() {
+          isLoading = false;
+          showLowScore = settings.showLowScore;
+          taskUnavailableMessage = lng.childTaskNotSelected;
+        });
+        return;
+      }
+
+      // Защита от задания без примеров.
+      if (loadedTask.items.isEmpty) {
+        setState(() {
+          isLoading = false;
+          showLowScore = settings.showLowScore;
+          taskUnavailableMessage =
+              'В задании пока нет примеров.\n\n'
+              'Попросите взрослого проверить это задание.';
+        });
+        return;
+      }
+
+      final firstUnansweredIndex = loadedTask.items.indexWhere(
+        (item) => item.answer == null,
+      );
+
+      setState(() {
+        task = loadedTask;
+        showLowScore = settings.showLowScore;
+
+        currentItemIndex = firstUnansweredIndex == -1
+            ? loadedTask!.items.length - 1
+            : firstUnansweredIndex;
+
+        currentItem = loadedTask!.items[currentItemIndex];
+
+        taskCompleted = loadedTask.statistics.completed;
+        learningStageCompleted = false;
+        isLoading = false;
+
+        if (taskCompleted) {
+          rabbitState = RabbitState.bye;
+          resultMessage = _completedMessage(loadedTask);
+        } else {
+          rabbitState = RabbitState.calcing;
+          resultMessage = null;
+        }
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        isLoading = false;
+        taskUnavailableMessage =
+            'Не удалось загрузить задания.\n\n'
+            'Попробуйте перезапустить приложение. '
+            'Если проблема повторится, обратитесь к взрослому.';
+      });
+    }
   }
 
   String? _scoreText(Task completedTask) {
@@ -180,6 +262,21 @@ class _ChildScreenState extends State<ChildScreen> {
 
     final settings = await settingsStorage.loadSettings();
 
+    if (nextTask.items.isEmpty) {
+      if (!mounted) return;
+
+      setState(() {
+        taskUnavailableMessage =
+            'В следующем задании пока нет примеров.\n\n'
+            'Попросите взрослого проверить это задание.';
+        task = null;
+        currentItem = null;
+        isLoading = false;
+      });
+
+      return;
+    }
+
     final firstUnansweredIndex = nextTask.items.indexWhere(
       (item) => item.answer == null,
     );
@@ -200,6 +297,7 @@ class _ChildScreenState extends State<ChildScreen> {
 
       taskCompleted = nextTask.statistics.completed;
       learningStageCompleted = false;
+      taskUnavailableMessage = null;
 
       if (taskCompleted) {
         rabbitState = RabbitState.bye;
@@ -297,8 +395,45 @@ class _ChildScreenState extends State<ChildScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (task == null || currentItem == null) {
+    // Индикатор отображается только во время реальной загрузки.
+    if (isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    // Отдельный экран, если задание недоступно.
+    if (taskUnavailableMessage != null || task == null || currentItem == null) {
+      return ListenableBuilder(
+        listenable: lng,
+        builder: (context, child) {
+          return Scaffold(
+            appBar: AppBar(title: Text(lng.appTitle), centerTitle: true),
+            body: SafeArea(
+              child: Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      RabbitAvatar(state: RabbitState.think),
+                      const SizedBox(height: 24),
+                      Text(
+                        taskUnavailableMessage ??
+                            'Задание пока недоступно. '
+                                'Попросите взрослого проверить назначение.',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      );
     }
 
     return ListenableBuilder(

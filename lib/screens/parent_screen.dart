@@ -79,12 +79,18 @@ class _ParentScreenState extends State<ParentScreen> {
           content: Text(lng.parentDeleteAllMessage),
           actions: [
             TextButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color.fromARGB(255, 222, 243, 193),
+              ),
               onPressed: () {
                 Navigator.pop(context, false);
               },
               child: Text(lng.parentCancel),
             ),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color.fromARGB(255, 252, 151, 133),
+              ),
               onPressed: () {
                 Navigator.pop(context, true);
               },
@@ -120,6 +126,9 @@ class _ParentScreenState extends State<ParentScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
               child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color.fromARGB(255, 248, 220, 215),
+                ),
                 onPressed: () async {
                   await deleteCurrentTask(dialogContext);
                 },
@@ -129,6 +138,9 @@ class _ParentScreenState extends State<ParentScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
               child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color.fromARGB(255, 250, 189, 178),
+                ),
                 onPressed: () async {
                   await deleteAllTasks(dialogContext);
                 },
@@ -138,6 +150,9 @@ class _ParentScreenState extends State<ParentScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
               child: TextButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color.fromARGB(255, 185, 211, 228),
+                ),
                 onPressed: () {
                   Navigator.pop(dialogContext);
                 },
@@ -166,6 +181,9 @@ class _ParentScreenState extends State<ParentScreen> {
                 const SizedBox(height: 30),
 
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 180, 247, 174),
+                  ),
                   onPressed: () async {
                     await Navigator.push(
                       context,
@@ -184,6 +202,9 @@ class _ParentScreenState extends State<ParentScreen> {
                 const SizedBox(height: 15),
 
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 209, 248, 242),
+                  ),
                   onPressed: () {
                     showDialog(
                       context: context,
@@ -213,6 +234,9 @@ class _ParentScreenState extends State<ParentScreen> {
                 const SizedBox(height: 15),
 
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 245, 219, 148),
+                  ),
                   onPressed: () async {
                     final number = await storage.getCurrentTask();
 
@@ -234,6 +258,9 @@ class _ParentScreenState extends State<ParentScreen> {
                 const SizedBox(height: 15),
 
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 250, 189, 178),
+                  ),
                   onPressed: showDeleteDialog,
                   child: Text(lng.parentDeleteTask),
                 ),
@@ -241,6 +268,9 @@ class _ParentScreenState extends State<ParentScreen> {
                 const SizedBox(height: 15),
 
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 210, 247, 185),
+                  ),
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -255,6 +285,9 @@ class _ParentScreenState extends State<ParentScreen> {
                 const SizedBox(height: 15),
 
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 206, 190, 248),
+                  ),
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -268,6 +301,9 @@ class _ParentScreenState extends State<ParentScreen> {
                 const SizedBox(height: 15),
 
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 243, 239, 188),
+                  ),
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -276,7 +312,7 @@ class _ParentScreenState extends State<ParentScreen> {
                       ),
                     );
                   },
-                  child: const Text('About'),
+                  child: Text(lng.aboutButton),
                 ),
               ],
             ),

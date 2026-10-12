@@ -102,4 +102,9 @@ class EnglishStrings {
   String get childEnterNumber => 'Enter a number';
   String get childCorrect => 'Correct!';
   String get childIncorrect => 'Incorrect';
+
+  String get childNoTasks => 'No tasks have been created yet.';
+  String get childTaskNotSelected => 'Tasks exist, but none is assigned.';
+
+  String get aboutButton => 'About';
 }

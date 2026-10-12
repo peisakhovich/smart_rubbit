@@ -103,4 +103,9 @@ class GermanStrings {
   String get childEnterNumber => 'Gib eine Zahl ein';
   String get childCorrect => 'Richtig!';
   String get childIncorrect => 'Falsch';
+  String get childNoTasks => 'Es wurden noch keine Aufgaben erstellt.';
+  String get childTaskNotSelected =>
+      'Es gibt Aufgaben, aber keine wurde zugewiesen.';
+
+  String get aboutButton => 'Über die App';
 }

@@ -23,6 +23,9 @@ class HomeScreen extends StatelessWidget {
                 const RabbitAvatar(state: RabbitState.hi),
                 const SizedBox(height: 40),
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 200, 247, 169),
+                  ),
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -35,6 +38,9 @@ class HomeScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color.fromARGB(255, 120, 201, 247),
+                  ),
                   onPressed: () {
                     Navigator.push(
                       context,

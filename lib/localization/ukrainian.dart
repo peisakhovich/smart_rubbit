@@ -103,4 +103,9 @@ class UkrainianStrings {
   String get childEnterNumber => 'Введіть число';
   String get childCorrect => 'Правильно!';
   String get childIncorrect => 'Неправильно';
+  String get childNoTasks => 'Ще не створено жодного завдання.';
+  String get childTaskNotSelected =>
+      'Завдання існують, але жодне не призначено.';
+
+  String get aboutButton => 'Про застосунок';
 }

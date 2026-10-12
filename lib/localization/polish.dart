@@ -102,4 +102,9 @@ class PolishStrings {
   String get childEnterNumber => 'Wpisz liczbę';
   String get childCorrect => 'Dobrze!';
   String get childIncorrect => 'Niepoprawnie';
+  String get childNoTasks => 'Nie utworzono jeszcze żadnych zadań.';
+  String get childTaskNotSelected =>
+      'Zadania istnieją, ale żadne nie zostało przypisane.';
+
+  String get aboutButton => 'O aplikacji';
 }

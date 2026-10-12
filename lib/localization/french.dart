@@ -105,4 +105,9 @@ class FrenchStrings {
   String get childEnterNumber => 'Saisissez un nombre';
   String get childCorrect => 'Correct !';
   String get childIncorrect => 'Incorrect';
+  String get childNoTasks => 'Aucune tâche n’a encore été créée.';
+  String get childTaskNotSelected =>
+      'Des tâches existent, mais aucune n’a été attribuée.';
+
+  String get aboutButton => 'À propos';
 }
