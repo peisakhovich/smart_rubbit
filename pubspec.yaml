@@ -1,7 +1,5 @@
 name: smart_rabbit
 description: "A new Flutter project."
-# The following line prevents the package from being accidentally published to
-# pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none'
 
 version: 1.0.1+2
@@ -23,6 +21,7 @@ flutter_launcher_icons:
   android: true
   ios: true
   image_path: "assets/images/uszko/Uszko.png"
+  remove_alpha_ios: true
 
 dev_dependencies:
   flutter_test:
